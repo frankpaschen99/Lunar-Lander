@@ -1,0 +1,5 @@
+1. Configure gravity to be more moon-like
+2. Allow sprite rotation and angular velocity
+3. In the collision callback, calculate velocity of the colliding body and determine if it is too fast for a successful landing.
+	3a. Also, check the rotation and make sure it is 0 degrees +- 5
+4. Fix collision polygon. Read tutorials or something for PhysicsEditor
