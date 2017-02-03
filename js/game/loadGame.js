@@ -24,7 +24,7 @@ LoadGame.prototype = {
     },
 
     preload: function () {
-        this.game.load.physics("level_physics", "js/game/assets/LEVEL_COLLISION.json");
+        this.game.load.physics("level_physics", "js/game/assets/LEVEL_COLLISION_NEW.json");
         this.loadScripts();
         this.loadImages();
         this.loadFonts();

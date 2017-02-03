@@ -6,38 +6,48 @@ var cursors;
 MainGame.prototype = {
     create: function () {
 
-		player = new Player(10, 10);
 		cursors = game.input.keyboard.createCursorKeys();
 
-		game.physics.startSystem(Phaser.Physics.Arcade);
 		game.physics.startSystem(Phaser.Physics.P2JS);
+
 		game.physics.p2.setImpactEvents(true);
 
-		game.physics.arcade.gravity = new Phaser.Point(0, 3);
-
+		game.physics.p2.gravity.y = 20;
+		
+		
+		player = new Player(1000, 10);
+		
 		buildWorld();
-		game.world.setBounds(0, 0, 30408, 1000);
+		game.world.setBounds(0, 0, 30408, 2000);
+
     },
 
     update: function () {
 		player.update();
+    }
 };
 
 function buildWorld() {
 	/* contigous level */
 	for (var count = 0, i = 0; i < 25; i++, count+= 1267) {
-		var sprite = game.add.sprite((1920-1267)+count, 1080-191, 'level');
-		game.physics.p2.enable(sprite, false);
+		var sprite = game.add.sprite((1920-1267)+count, 1080-200, 'level');
+		game.physics.p2.enable(sprite, true);
 		sprite.body.clearShapes();
 
 		sprite.body.loadPolygon('level_physics', 'level');
 		sprite.body.static = true;
+		
 	}
 }
 
 class Player {
 	constructor(posX, posY) {
+
 		this.sprite = game.add.sprite(posX, posY, 'lander');
+		
+		game.physics.p2.enable(this.sprite, true);
+
+		this.sprite.body.onBeginContact.add(landerCollision);
 
 	}
 	update(deltaTime) {
@@ -51,6 +61,10 @@ class Player {
 	}
 }
 
+function landerCollision(body, shape1, shape2, equation) {
+	console.log("called");
+	console.log(body);
+}
 
 /****
 
