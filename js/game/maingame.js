@@ -11,10 +11,10 @@ MainGame.prototype = {
 		/* Setup physics */
 		game.physics.startSystem(Phaser.Physics.P2JS);
 		game.physics.p2.setImpactEvents(true);
-		game.physics.p2.gravity.y = 20;
+		game.physics.p2.gravity.y = 3;
 		
 		// Create player lander
-		player = new Player(1000, 10);
+		player = new Player(500, 10);
 
 		// Generate world w/ polygon collider
 		buildWorld();
@@ -32,7 +32,7 @@ function buildWorld() {
 	/* Generate contiguous level */
 	for (var count = 0, i = 0; i < 25; i++, count+= 1267) {
 		var sprite = game.add.sprite((1920-1267)+count, 1080-200, 'level');
-		game.physics.p2.enable(sprite, true);
+		game.physics.p2.enable(sprite, false);
 		sprite.body.clearShapes();
 
 		sprite.body.loadPolygon('level_physics', 'level');
@@ -45,13 +45,46 @@ class Player {
 
 		this.sprite = game.add.sprite(posX, posY, 'lander');
 		
-		game.physics.p2.enable(this.sprite, true);
+		game.physics.p2.enable(this.sprite, false);
 		// Collision callback
 		this.sprite.body.onBeginContact.add(this.landerCollision);
-
+		
+		this.score = 0;
 	}
 	update(deltaTime) {
-		game.debug.cameraInfo(game.camera, 32, 32);
+		// game.debug.cameraInfo(game.camera, 32, 32);			do this later lol
+		
+		/* Calculate velocity vector based on sprite angle */
+		if (cursors.up.isDown) {
+			
+			/* STOLEN CODE FTW */
+			var rotation = Math.atan2(this.sprite.body.x, this.sprite.body.y);
+			var angle = -this.sprite.body.rotation + (Math.PI / 2);
+			this.sprite.body.velocity.x += 0.5 * Math.cos(angle);
+			this.sprite.body.velocity.y += 0.5 * Math.sin(-angle);
+			
+		}
+		/* Left/Right rotation */
+		if (cursors.right.isDown) {
+			if (this.sprite.body.angle < 90) 
+				this.sprite.body.angularVelocity = 2;
+			else {
+				this.sprite.body.angularVelocity = 0;
+				this.sprite.body.angle = 90;
+			}
+		} else if (cursors.left.isDown) {
+			if (this.sprite.body.angle > -90) 
+				this.sprite.body.angularVelocity = -2;
+			else {
+				this.sprite.body.angularVelocity = 0;
+				this.sprite.body.angle = -90;
+			}
+		} else {
+			// stop angular velocity
+			this.sprite.body.angularVelocity = 0;
+		}
+
+		// console.log("Velocity.x: " + this.sprite.body.velocity.x + ", Velocity.y: " + this.sprite.body.velocity.y + ", AngularVelocity: " + this.sprite.body.angularVelocity + ", Sprite Angle: " + this.sprite.body.angle);
 	}
 	success() {
 		// reset their position
@@ -62,7 +95,8 @@ class Player {
 	landerCollision(body, shape1, shape2, equation) {
 		// handle colliding
 		// call success() or fail()
-	}	
+		
+	}
 }
 
 
