@@ -4,10 +4,12 @@ var player;
 var cursors;
 var line;
 var line2;
+var line3;
 
 var CONFIG_ACCELERATION_COEFFICIENT = 0.5;								// DEFAULT = 0.5
 var CONFIG_WORLD_GRAVITY = 10;											// DEFAULT = 3
 var CONFIG_PLAYER_START_POSITION = new Phaser.Point(500, 10);			// DEFAULT = new Phaser.Point(10, 10);
+
 MainGame.prototype = {
     create: function () {
 		game.physics.startSystem(Phaser.Physics.P2JS);
@@ -18,6 +20,7 @@ MainGame.prototype = {
 		cursors = game.input.keyboard.createCursorKeys();
 		line = new Phaser.Line();
 		line2 = new Phaser.Line();
+		line3 = new Phaser.Line();
 		player = new Player(CONFIG_PLAYER_START_POSITION);
 		buildWorld();
     },
@@ -39,12 +42,14 @@ function buildWorld() {
 
 class Player {
 	constructor(spawnPos) {
+		this.spawnPos = spawnPos;
 		this.sprite = game.add.sprite(spawnPos.x, spawnPos.y, 'lander');
 		this.score = 0;
 		this.landed = false;
 		game.physics.p2.enable(this.sprite, false);
 	}
 	update(deltaTime) {
+		game.debug.cameraInfo(game.camera, 32, 32);
 		
 		/* UP ARROW INPUT */
 		if (cursors.up.isDown && !this.landed) {
@@ -74,6 +79,12 @@ class Player {
 
 		this.distanceFromTerrain();
 		// test distanceFromTerrain, zoom in camera and rescale sprite 
+		
+		//  console.log(this.sprite.position.y);
+		if (this.sprite.position.y >= 650) {
+			// zoom in cam
+			game.camera.follow(this.sprite);
+		}
 	}
 	/* return the distance in pixels from the nearest terrain */
 	distanceFromTerrain() {
@@ -86,10 +97,14 @@ class Player {
 		// left-facing raycast
 		line2.start.set(this.sprite.x, this.sprite.y);
 		line2.end.set(this.sprite.x-x, this.sprite.y+x);
+		// downwards-facing raycast
+		line3.start.set(this.sprite.x, this.sprite.y);
+		line3.end.set(this.sprite.x, this.sprite.y+700);
 		
 		// debug so we can see them
 		game.debug.geom(line);
 		game.debug.geom(line2);
+		game.debug.geom(line3);
 
 	}
 	success() {
