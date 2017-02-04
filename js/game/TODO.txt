@@ -1,5 +1,9 @@
 1. Configure gravity to be more moon-like				- COMPLETE 2/4/17
 2. Allow sprite rotation and angular velocity			- COMPLETE 2/4/17
 3. In the collision callback, calculate velocity of the colliding body and determine if it is too fast for a successful landing.
-	3a. Also, check the rotation and make sure it is 0 degrees +- 5
-4. Fix collision polygon. Read tutorials or something for PhysicsEditor
+	3a. Also, check the rotation and make sure it is 0 degrees +- 5		-- COMPLETE 2/4/17
+4. Fix collision polygon. Read tutorials or something for PhysicsEditor		
+5. Have the level represented by a series of Points, use the Raycasts to test for an intersection of these points 
+			Phaser.Line.intersects(raycast, levelLines[i])
+	If there is an intersection, test the distance by using math.distance(raystart.x, raystart.y, intersectx, intersecty)
+6. Manipulate the camera and sprite size if the distance is small enough
