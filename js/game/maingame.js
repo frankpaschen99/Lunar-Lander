@@ -3,6 +3,9 @@ var MainGame = function () {};
 var player;
 var cursors;
 
+var CONFIG_ACCELERATION_COEFFICIENT = 0.5;
+var CONFIG_WORLD_GRAVITY = 3;
+var CONFIG_PLAYER_START_POSITION = new Phaser.Point(500, 10);
 MainGame.prototype = {
     create: function () {
 
@@ -11,10 +14,10 @@ MainGame.prototype = {
 		/* Setup physics */
 		game.physics.startSystem(Phaser.Physics.P2JS);
 		game.physics.p2.setImpactEvents(true);
-		game.physics.p2.gravity.y = 3;
+		game.physics.p2.gravity.y = CONFIG_WORLD_GRAVITY;
 		
 		// Create player lander
-		player = new Player(500, 10);
+		player = new Player(CONFIG_PLAYER_START_POSITION);
 
 		// Generate world w/ polygon collider
 		buildWorld();
@@ -41,9 +44,9 @@ function buildWorld() {
 }
 
 class Player {
-	constructor(posX, posY) {
+	constructor(spawnPos) {
 
-		this.sprite = game.add.sprite(posX, posY, 'lander');
+		this.sprite = game.add.sprite(spawnPos.x, spawnPos.y, 'lander');
 		
 		game.physics.p2.enable(this.sprite, false);
 		// Collision callback
@@ -58,10 +61,12 @@ class Player {
 		if (cursors.up.isDown) {
 			
 			/* STOLEN CODE FTW */
-			var rotation = Math.atan2(this.sprite.body.x, this.sprite.body.y);
-			var angle = -this.sprite.body.rotation + (Math.PI / 2);
-			this.sprite.body.velocity.x += 0.5 * Math.cos(angle);
-			this.sprite.body.velocity.y += 0.5 * Math.sin(-angle);
+			// Adding pi/2 fixes the directions somehow. Gotta learn more about radians to know wtf is going on here.
+			// btw body.rotation is in radians.
+			var angle = -this.sprite.body.rotation; + (Math.PI/2);
+			
+			this.sprite.body.velocity.x += CONFIG_ACCELERATION_COEFFICIENT * Math.cos(angle);
+			this.sprite.body.velocity.y += CONFIG_ACCELERATION_COEFFICIENT * Math.sin(-angle);
 			
 		}
 		/* Left/Right rotation */
