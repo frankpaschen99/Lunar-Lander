@@ -6,7 +6,7 @@ var line;
 var line2;
 var line3;
 
-var CONFIG_ACCELERATION_COEFFICIENT = 0.5;								// DEFAULT = 0.5
+var CONFIG_ACCELERATION_COEFFICIENT = 0.25;								// DEFAULT = 0.5
 var CONFIG_WORLD_GRAVITY = 10;											// DEFAULT = 3
 var CONFIG_PLAYER_START_POSITION = new Phaser.Point(500, 10);			// DEFAULT = new Phaser.Point(10, 10);
 
@@ -23,6 +23,9 @@ MainGame.prototype = {
 		line3 = new Phaser.Line();
 		player = new Player(CONFIG_PLAYER_START_POSITION);
 		buildWorld();
+		
+		game.camera.scale.setTo(1,1);
+		
     },
     update: function () {
 		player.update();
@@ -47,6 +50,10 @@ class Player {
 		this.score = 0;
 		this.landed = false;
 		game.physics.p2.enable(this.sprite, false);
+		
+		var style = { font: "32px Arial", fill: "#FFF", wordWrap: false, wordWrapWidth: 0, align: "", backgroundColor: "#000" };
+		this.velocityText = game.add.text(1200, 0, "", style);
+   
 	}
 	update(deltaTime) {
 		game.debug.cameraInfo(game.camera, 32, 32);
@@ -79,16 +86,19 @@ class Player {
 
 		this.distanceFromTerrain();
 		// test distanceFromTerrain, zoom in camera and rescale sprite 
-		
-		//  console.log(this.sprite.position.y);
 		if (this.sprite.position.y >= 650) {
 			// zoom in cam
 			game.camera.follow(this.sprite);
 		}
+		
+		/* Update HUD */
+		this.velocityText.setText("HORIZONTAL SPEED\t" + Math.abs(Math.floor(this.sprite.body.velocity.x)) + "\nVERTICAL SPEED\t" + Math.abs(Math.floor(this.sprite.body.velocity.y)));
 	}
 	/* return the distance in pixels from the nearest terrain */
+	/* TODO: figure this out */
 	distanceFromTerrain() {
 		// the length of the adjacent and opposite, knowing the angle of 45 deg. Add these to sprite pos to get raycast end
+		// PI/180 is for converting degrees to radians
 		var x = Math.sin(45 * (Math.PI / 180.0)) * 1000;
 		
 		// right-facing raycast
